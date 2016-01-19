@@ -1,0 +1,12 @@
+由于PDF文件过多，故仅列出作为参考：
+
+ST官方：
+       PM0214 -- STM32F3 and STM32F4 Series Cortex-M4 programming manual
+       RM0090 -- STM32F405xx/07xx, STM32F415xx/17xx, STM32F42xxx and STM32F43xxx advanced ARM?-based 32-bit MCUs
+       STM32F405xx STM32F407xx Datasheet
+       STM32F40x and STM32F41x Errata sheet
+ARM官方：
+       Cortex-M3 权威指南(Joseph Yiu 著 宋岩 译)
+       (Cortex-M3 权威指南)The Definitive Guide to ARM Cortex-M3 and Cortex-M4 Processors
+其他：
+       安富莱STM32-V5开发板  系统篇教程(UM401) (WWW.ARMFLY.COM)
