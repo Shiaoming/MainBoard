@@ -47,14 +47,14 @@ extern CPU_STK TASK_START_STK[STARTUP_TASK_STK_SIZE];	// 任务堆栈空间
 // 按键拨码读取任务
 #define TASK_KEY_PRIO 14								// 任务优先级
 #define TASK_KEY_STK_SIZE 128							// 任务堆栈大小
-#define TASK_KEY_DELAY 10				// 任务延时
+#define TASK_KEY_DELAY 20				// 任务延时
 
 // 手柄读取任务
 #define TASK_PS_PRIO 8								// 任务优先级
 #define TASK_PS_STK_SIZE 128							// 任务堆栈大小
 #define TASK_PS_DELAY 20				// 任务延时
 
-// ADC采集任务
+// 手柄读取任务
 #define TASK_ADC_PRIO 9								// 任务优先级
 #define TASK_ADC_STK_SIZE 128							// 任务堆栈大小
 #define TASK_ADC_DELAY 20				// 任务延时

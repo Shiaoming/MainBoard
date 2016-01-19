@@ -1,6 +1,6 @@
 #include "includes.h"
 
-extern u16 temp_val[20];
+extern u32 temp_val[20];
 
 void ADC_Configuration(void);
  //u16 Get_Adc(u8 ch);

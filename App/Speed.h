@@ -3,7 +3,9 @@
 
 #define LL1  535.0  //新底盘尺寸  
 #define LL2  464.0
-#define R   50.0
+#define R   500.0
+
+#define MAX_WHELL_SPEED		40
 
 /**
   * @说明 速度定义
@@ -24,9 +26,9 @@ typedef struct
 
 extern RobotWspeed robotw; 
 
-#define VX 100
-#define VY 100
-#define WZ 50
+#define VX 50
+#define VY 50
+#define WZ 10
 
 void PS_Digital_Mode(void);
 void PS_Analog_Red(void);

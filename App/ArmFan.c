@@ -9,6 +9,9 @@ void Set_Fan(s16 height,s16 FanSpeed,s16 FanDirection)
 {
 	int CAN2_TX_id = 0x280;
 	u8 CAN2_TX_data[8];
+
+	if(height > HEIGHT_MAX)height = HEIGHT_MAX;
+	else if(height < HEIGHT_MIN)height = HEIGHT_MIN;
 	
 	CAN2_TX_data[0] = 0;CAN2_TX_data[1] = 0;
 	CAN2_TX_data[2] = (u8)(height>>8);CAN2_TX_data[3] = (u8)height;

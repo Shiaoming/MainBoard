@@ -44,11 +44,16 @@ CPU_STK TASK_PS_STK[TASK_KEY_STK_SIZE];		// 任务堆栈空间
 // 红外读取任务
 OS_TCB TASK_ADC_TCB;							// 任务TCB控制块
 CPU_STK TASK_ADC_STK[TASK_KEY_STK_SIZE];		// 任务堆栈空间
-//是否读取完手柄的信号量
-OS_SEM PS_Readed;
 
 float infrared_data1;
 float infrared_data2;
+float infrared_data3;
+double distance1 ;
+double distance2 ;
+double fanheight ;
+double ave_distance ;
+double xielv ;
+
 u16 can1id_diceng = 0x90;                                                //底层板初始化
 u16 can1id_pagan = 0x91;                                                 //爬杆初始化
 u8 can1data_disable[8] = { 0,0,0,0,0,0,0,0};                     //失能模式
@@ -191,7 +196,7 @@ void TASK_LED_BEEP(void *p_arg)
 	
 
 	
-	//Sys_Start();
+	Sys_Start();
     
     while (1)
     {
@@ -224,12 +229,69 @@ void TASK_CAN(void *p_arg)
     CAN2_Send_Msg();
     while (1)
     {
-		OSSemPend(&PS_Readed,5000,OS_OPT_PEND_BLOCKING,NULL,&err);
+		//获取手柄数据
+        Get_PS_Data();
+      	PS_Digital_Mode();
+		
+		infrared_data1 = Get_Adc_Average(0);  
+		infrared_data2 = Get_Adc_Average(1);
+	
+		distance1 = -17.59*log(infrared_data1)+ 146.48;
+        distance2 = -15.95*log(infrared_data2)+ 134.42;
+		
+		
+		infrared_data3 = Get_Adc_Average(2);   //风扇机械臂红外数据
+		
+		fanheight = -15.95*log(infrared_data3)+ 134.42;                             //最佳离跑道高度15
+			
+		ave_distance = (distance1+distance2)/2.0 ;
+		
+		xielv = (distance1-distance2)/50.0;    //底盘机器人红外安装间距50mm
+		
+		if(ave_distance<25)
+		{
+			if(ave_distance<10)
+			{
+				Speed.vy = -20;
+
+			}
+			else if(ave_distance>15)
+			{
+					
+				Speed.vy = 20;
+			}
+			else 
+			{
+				Speed.vy = 0;
+			}
+			
+			if(xielv<0)
+			{
+				Speed.wz = -5;
+
+			}
+			else if(xielv>0)
+			{
+					
+				Speed.wz = 5;
+			}
+			else 
+			{
+				Speed.wz = 0;
+			}	
+		}
+		else
+		{
+			Speed.vy = 0;
+			Speed.wz = 0;
+			
+		}
+        
 		
 		//设置底盘速度
         Set_Speed();
 		//设置风扇机械臂速度和位置
-		Set_Fan(FanCMD.height,FanCMD.FanSpeed,FanCMD.FanDirection);
+		Set_Fan(FanCMD.height-(fanheight-15.0)*10.0,FanCMD.FanSpeed,FanCMD.FanDirection);
 		
 		OSTimeDlyHMSM(0, 0, 0, TASK_CAN_DELAY,
                       OS_OPT_TIME_HMSM_STRICT,
@@ -255,7 +317,7 @@ void TASK_TIME(void *p_arg)
 		Time.min = OS_ticks/60%60;
 		Time.hour = OS_ticks/3600%60;			
 
-		OSTimeDlyHMSM(0, 0, 0, TASK_TIME_DELAY,
+		OSTimeDlyHMSM(0, 0, 1, 0,
                       OS_OPT_TIME_HMSM_NON_STRICT,
                       &err);
 	}
@@ -292,7 +354,7 @@ void TASK_SHOW(void *p_arg)
 //		OLED_P6x8Str(90,2,(u8*)cpu_usage_s);
 //		CPU_CRITICAL_EXIT(); // 退出关键段，开启全局中断，视具体情况添加此语句
 
-		OSTimeDlyHMSM(0, 0, 0, TASK_SHOW_DELAY,
+		OSTimeDlyHMSM(0, 0, 1, 0,
                       OS_OPT_TIME_HMSM_NON_STRICT,
                       &err);
 	}
@@ -305,17 +367,13 @@ void TASK_SHOW(void *p_arg)
 void TASK_KEY(void *p_arg)
 {
 	OS_ERR err;
-		
-	OSSemCreate(&PS_Readed,"PS-is read or not",0,&err);
 	
+		
 	while(1)
 	{
-		//获取手柄数据
-        Get_PS_Data();
-      	PS_Digital_Mode();
-		OSSemPost(&PS_Readed,OS_OPT_POST_ALL,&err);
 
-		OSTimeDlyHMSM(0, 0, 0, TASK_KEY_DELAY,
+
+		OSTimeDlyHMSM(0, 0, 1, 0,
                       OS_OPT_TIME_HMSM_NON_STRICT,
                       &err);
 	}
@@ -353,10 +411,9 @@ void TASK_ADC(void *p_arg)
 	
 	while(1)
 	{
-      infrared_data1 = Get_Adc_Average(0);
-      //infrared_data2 = Get_Adc_Average(ADC_Channel_12,20);
-     // if (infrared_data1)
-		OSTimeDlyHMSM(0, 0, 1, 0,
+      
+	  //Set_Speed();
+		OSTimeDlyHMSM(0, 0, 0, 20,
                       OS_OPT_TIME_HMSM_NON_STRICT,
                       &err);
         

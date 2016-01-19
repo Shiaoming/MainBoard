@@ -6,7 +6,7 @@
 #define ADC1_DR_Address  ((uint32_t)0X4001204C)
 
 #define  N   20      //每通道采20次 
-#define  M  2      //为2个通道   
+#define  M  3      //为2个通道   
 vu16  AD_Value[N][M];   //用来存放ADC转换结果，也是DMA的目标地址
 
 void ADC_Configuration(void)
@@ -68,7 +68,7 @@ void ADC_Configuration(void)
 	ADC_CommonInit(&ADC_CommonInitStructure);//初始化
 	
 	
-	DMA_InitStructure.DMA_BufferSize = 40;
+	DMA_InitStructure.DMA_BufferSize = N*M;
     
     DMA_InitStructure.DMA_Channel = DMA_Channel_0;
     
@@ -116,7 +116,7 @@ void ADC_Configuration(void)
 	
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;//右对齐      
 	
-	ADC_InitStructure.ADC_NbrOfConversion = 2;//2个转换在规则序列中
+	ADC_InitStructure.ADC_NbrOfConversion = 3;//2个转换在规则序列中
 	
 	ADC_Init(ADC1, &ADC_InitStructure);//ADC初始化
     
@@ -126,6 +126,7 @@ void ADC_Configuration(void)
     
     ADC_RegularChannelConfig(ADC1,ADC_Channel_12,2,ADC_SampleTime_480Cycles);
 	
+    ADC_RegularChannelConfig(ADC1,ADC_Channel_13,3,ADC_SampleTime_480Cycles);
 	
     ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);  //if not have this function , can't get new value
      
@@ -165,17 +166,17 @@ void ADC_Configuration(void)
 //	return ADC_GetConversionValue(ADC1);     //返回最近一次ADC1规则组的转换结果
 //	
 //}
-u16 temp_val[20];
+u32 temp_val[20];
 
 u16 Get_Adc_Average(u8 ch)
 {
 	
     u32 temp;
- //   float minAverage;
+    u16 minAverage;
 	u8 t;
 	for(t=0;t<20;t++)
 	{
-		temp_val[t]=AD_Value[t][ch]*3300/65535;
+		temp_val[t]=AD_Value[t][ch]*3300/4096;
       //  delay_us(5000);
         
 	}
@@ -197,11 +198,11 @@ u16 Get_Adc_Average(u8 ch)
       
     }
     
-//    for (t=0;t<10;t++)
-//    {
-//      minAverage+=temp_val[t];
-//    }
-	return (temp_val[0]);
+    for (t=5;t<10;t++)
+    {
+      minAverage+=temp_val[t];
+    }
+	return (minAverage/5);
 } 	 
 
 

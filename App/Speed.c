@@ -114,13 +114,13 @@ void PS_Digital_Mode(void)
     
     if((PS.PS_Data[3] & Triangle) == 0)
 	{
-		FanCMD.height +=2;
+		FanCMD.height ++;
 		if(FanCMD.height > HEIGHT_MAX)FanCMD.height = HEIGHT_MAX;
 		else if(FanCMD.height < HEIGHT_MIN)FanCMD.height = HEIGHT_MIN;
 	}
 	else if((PS.PS_Data[3] & Cross) == 0)
 	{
-		FanCMD.height -=2;
+		FanCMD.height --;
 		if(FanCMD.height > HEIGHT_MAX)FanCMD.height = HEIGHT_MAX;
 		else if(FanCMD.height < HEIGHT_MIN)FanCMD.height = HEIGHT_MIN;
 	}
@@ -198,12 +198,23 @@ void PS_Analog_Red(void)
 }
 
 void WSpeed(float vx, float vy,float wz)    //麦克纳姆轮运动方程
-{
-  
+{  
   robotw.speed0=(s32)(((vx-vy)+(LL1+LL2)*wz/550)/PI/R/2*1000);//0
   robotw.speed1=(s32)((-(vx+vy)+(LL1+LL2)*wz/550)/PI/R/2*1000);//1
   robotw.speed2=(s32)(((vx-vy)-(LL1+LL2)*wz/550)/PI/R/2*1000);//2
   robotw.speed3=(s32)((-(vx+vy)-(LL1+LL2)*wz/550)/PI/R/2*1000);//3
+  
+  if(robotw.speed0 > MAX_WHELL_SPEED)robotw.speed0 = MAX_WHELL_SPEED;
+  else if(robotw.speed0 < -MAX_WHELL_SPEED)robotw.speed0 = -MAX_WHELL_SPEED;
+  
+  if(robotw.speed1 > MAX_WHELL_SPEED)robotw.speed1 = MAX_WHELL_SPEED;
+  else if(robotw.speed1 < -MAX_WHELL_SPEED)robotw.speed1 = -MAX_WHELL_SPEED;
+  
+  if(robotw.speed2 > MAX_WHELL_SPEED)robotw.speed2 = MAX_WHELL_SPEED;
+  else if(robotw.speed2 < -MAX_WHELL_SPEED)robotw.speed2 = -MAX_WHELL_SPEED;
+  
+  if(robotw.speed3 > MAX_WHELL_SPEED)robotw.speed3 = MAX_WHELL_SPEED;
+  else if(robotw.speed3 < -MAX_WHELL_SPEED)robotw.speed3 = -MAX_WHELL_SPEED;
   
 }
 
