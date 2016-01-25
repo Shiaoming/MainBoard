@@ -33,4 +33,4 @@ extern RobotWspeed robotw;
 void PS_Digital_Mode(void);
 void PS_Analog_Red(void);
 void Set_Speed(void);
-
+void Speed_Mode_Init(void);

@@ -11,8 +11,7 @@ typedef struct
 }Time_TypeDef;
 
 
-void Struct_Init(void);
-
+void App_Init(void);
 void Sys_Start(void);
 
 

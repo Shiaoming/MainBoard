@@ -17,8 +17,6 @@
 
 #include "includes.h"
 
-
-
 /* 以下为各个任务的堆栈空间 */
 // 启动任务(启动任务在main.c中调用了)
 OS_TCB TASK_START_TCB;							// 任务TCB控制块
@@ -45,20 +43,7 @@ CPU_STK TASK_PS_STK[TASK_KEY_STK_SIZE];		// 任务堆栈空间
 OS_TCB TASK_ADC_TCB;							// 任务TCB控制块
 CPU_STK TASK_ADC_STK[TASK_KEY_STK_SIZE];		// 任务堆栈空间
 
-float infrared_data1;
-float infrared_data2;
-float infrared_data3;
-double distance1 ;
-double distance2 ;
-double fanheight ;
-double ave_distance ;
-double xielv ;
 
-u16 can1id_diceng = 0x90;                                                //底层板初始化
-u16 can1id_pagan = 0x91;                                                 //爬杆初始化
-u8 can1data_disable[8] = { 0,0,0,0,0,0,0,0};                     //失能模式
-u8 can1data_speed[8] = { 0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55};//速度环模式
-u8 can1data_PWM[8] = { 0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,0xAA};//PWM开环模式
 
 /*******************************************************************************
 函 数 名：TASK_START(void)
@@ -72,20 +57,14 @@ void TASK_START(void)
     CPU_Init();
 	// SysTick初始化
     SysTickInit();
-	// 中断向量表配置
-	NVIC_Config();	
-    PS_Init();	
-    KEY_Init();	
-	STATU_Init();
-	LED_Init();
-	BEEP_Init();
-    CAN1_Init();
-	CAN2_Init();
-    OLED_Init();
-    ADC_Configuration();
-	FanCMD.height = 250;
-	FanCMD.FanSpeed = 0;
-	FanCMD.FanDirection = 55;
+	
+	////////Todo:外设初始化、系统变量初始化
+    // 各个外设的初始化
+	Peripheral_Init();
+	// 系统变量初始化
+	App_Init();
+	
+	
     
 #if OS_CFG_STAT_TASK_EN > 0u
     OSStatTaskCPUUsageInit(&err);                               /* Compute CPU capacity with no task running */
@@ -105,18 +84,18 @@ void TASK_START(void)
                  (OS_OPT     )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP), 
                  (OS_ERR     *)&err);	
 	OSTaskCreate((OS_TCB     *)&TASK_CAN_TCB,
-			 	(CPU_CHAR   *)"TASK_CAN",
-			 	(OS_TASK_PTR)TASK_CAN,
-			 	(void       *)0,
-			 	(OS_PRIO    )TASK_CAN_PRIO,
-			 	(CPU_STK    *)&TASK_CAN_STK[0],
-			 	(CPU_STK_SIZE)TASK_CAN_STK_SIZE / 10,
-			 	(CPU_STK_SIZE)TASK_CAN_STK_SIZE,
-			 	(OS_MSG_QTY )0,
-			 	(OS_TICK    )0,
-			 	(void       *)0,
-			 	(OS_OPT     )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR /*| OS_OPT_TASK_SAVE_FP*/), 
-			 	(OS_ERR     *)&err);
+			 	 (CPU_CHAR   *)"TASK_CAN",
+			 	 (OS_TASK_PTR)TASK_CAN,
+			 	 (void       *)0,
+			 	 (OS_PRIO    )TASK_CAN_PRIO,
+			 	 (CPU_STK    *)&TASK_CAN_STK[0],
+			 	 (CPU_STK_SIZE)TASK_CAN_STK_SIZE / 10,
+			 	 (CPU_STK_SIZE)TASK_CAN_STK_SIZE,
+			 	 (OS_MSG_QTY )0,
+			 	 (OS_TICK    )0,
+			 	 (void       *)0,
+			 	 (OS_OPT     )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR /*| OS_OPT_TASK_SAVE_FP*/), 
+			 	 (OS_ERR     *)&err);
 	OSTaskCreate((OS_TCB     *)&TASK_TIME_TCB,
 				 (CPU_CHAR   *)"TASK_TIME",
 				 (OS_TASK_PTR)TASK_TIME,
@@ -169,8 +148,8 @@ void TASK_START(void)
 				 (void       *)0,
 				 (OS_OPT     )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR ),
 				 (OS_ERR     *)&err);
-        OSTaskCreate((OS_TCB     *)&TASK_ADC_TCB,
-				 (CPU_CHAR   *)"TASK_ADC",
+	OSTaskCreate((OS_TCB     *)&TASK_ADC_TCB,
+			 	 (CPU_CHAR   *)"TASK_ADC",
 				 (OS_TASK_PTR)TASK_ADC,
 				 (void       *)0,
 				 (OS_PRIO    )TASK_ADC_PRIO,
@@ -182,6 +161,7 @@ void TASK_START(void)
 				 (void       *)0,
 				 (OS_OPT     )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR ),
 				 (OS_ERR     *)&err);
+	////////Todo:系统任务添加
 	// 删除启动任务
     OSTaskDel((OS_TCB*)&TASK_START_TCB,(OS_ERR*)&err);
 }
@@ -193,11 +173,11 @@ void TASK_START(void)
 void TASK_LED_BEEP(void *p_arg)
 {
     OS_ERR err;
-	
-
-	
+		
+	////OS正常初始化哔哔哔哔
 	Sys_Start();
     
+	//OS正常运行闪烁灯
     while (1)
     {
 		CORE_Toggle();
@@ -222,76 +202,21 @@ void TASK_CAN(void *p_arg)
 {
     OS_ERR err;
 	
-	
-	
-        // 配置为速度模式
-    InsertQueue(&CAN2_TX_Queue,can1id_diceng,can1data_speed);
-    CAN2_Send_Msg();
+	//底盘配置为速度控制模式
+	Speed_Mode_Init();
     while (1)
     {
 		//获取手柄数据
         Get_PS_Data();
-      	PS_Digital_Mode();
-		
-		infrared_data1 = Get_Adc_Average(0);  
-		infrared_data2 = Get_Adc_Average(1);
-	
-		distance1 = -17.59*log(infrared_data1)+ 146.48;
-        distance2 = -15.95*log(infrared_data2)+ 134.42;
-		
-		
-		infrared_data3 = Get_Adc_Average(2);   //风扇机械臂红外数据
-		
-		fanheight = -15.95*log(infrared_data3)+ 134.42;                             //最佳离跑道高度15
-			
-		ave_distance = (distance1+distance2)/2.0 ;
-		
-		xielv = (distance1-distance2)/50.0;    //底盘机器人红外安装间距50mm
-		
-		if(ave_distance<25)
-		{
-			if(ave_distance<10)
-			{
-				Speed.vy = -20;
-
-			}
-			else if(ave_distance>15)
-			{
-					
-				Speed.vy = 20;
-			}
-			else 
-			{
-				Speed.vy = 0;
-			}
-			
-			if(xielv<0)
-			{
-				Speed.wz = -5;
-
-			}
-			else if(xielv>0)
-			{
-					
-				Speed.wz = 5;
-			}
-			else 
-			{
-				Speed.wz = 0;
-			}	
-		}
-		else
-		{
-			Speed.vy = 0;
-			Speed.wz = 0;
-			
-		}
+		//防止碰撞
+		//Avoid_Confict();
         
 		
 		//设置底盘速度
         Set_Speed();
 		//设置风扇机械臂速度和位置
-		Set_Fan(FanCMD.height-(fanheight-15.0)*10.0,FanCMD.FanSpeed,FanCMD.FanDirection);
+		//Set_Fan(FanCMD.height-(fanheight-15.0)*10.0,FanCMD.FanSpeed,FanCMD.FanDirection);
+		Set_Fan(FanCMD.height,FanCMD.FanSpeed,FanCMD.FanDirection);
 		
 		OSTimeDlyHMSM(0, 0, 0, TASK_CAN_DELAY,
                       OS_OPT_TIME_HMSM_STRICT,
@@ -386,9 +311,6 @@ void TASK_PS(void *p_arg)
 {
 	OS_ERR err;
 	
-	
-
-	
 	while(1)
 	{
       
@@ -405,9 +327,6 @@ void TASK_PS(void *p_arg)
 void TASK_ADC(void *p_arg)
 {
 	OS_ERR err;
-	
-	
-
 	
 	while(1)
 	{

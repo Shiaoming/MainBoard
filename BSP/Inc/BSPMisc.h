@@ -74,13 +74,16 @@
 #define BEEP_OFF() 			GPIO_SetBits(PORT_BEEP,PIN_BEEP)
 #define BEEP_Toggle() 		GPIO_ToggleBits(PORT_BEEP,PIN_BEEP)
 
-
+//·¶Î§ÏÞÖÆ
+#define RANGE_LIMIT(x,min,max)	if(x > max)x = max;\
+								else if(x < min)x = min;
+#define abs(x)					fabs(x)
+								
 void delay_ms(int tmp);
 
-void NVIC_Config(void);
 void USART1_Init(void);
 void LED_Init(void);
 void KEY_Init(void);
 void BEEP_Init(void);
 void STATU_Init(void);
-
+void Peripheral_Init(void);

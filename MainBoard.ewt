@@ -173,12 +173,6 @@
   <group>
     <name>App</name>
     <file>
-      <name>$PROJ_DIR$\App\adc.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\App\adc.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\App\ArmFan.c</name>
     </file>
     <file>
@@ -191,10 +185,10 @@
       <name>$PROJ_DIR$\App\CANQueue.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\App\PS_Driver.c</name>
+      <name>$PROJ_DIR$\App\GP2Y0A21YK0F.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\App\PS_Driver.h</name>
+      <name>$PROJ_DIR$\App\GP2Y0A21YK0F.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\App\Speed.c</name>
@@ -217,6 +211,12 @@
   </group>
   <group>
     <name>BSP</name>
+    <file>
+      <name>$PROJ_DIR$\BSP\Src\adc.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\BSP\Inc\adc.h</name>
+    </file>
     <file>
       <name>$PROJ_DIR$\BSP\Src\BSP.c</name>
     </file>
@@ -242,10 +242,22 @@
       <name>$PROJ_DIR$\BSP\Inc\Can2.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\BSP\Inc\GYRO.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\BSP\Inc\GYRO.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\BSP\Src\oled.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\BSP\Inc\oled.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\BSP\Src\PS_Driver.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\BSP\Inc\PS_Driver.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\BSP\Src\Usart1.c</name>

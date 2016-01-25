@@ -10,6 +10,11 @@
 #define SPEED_MIN		0
 #define SPEED_MAX		500
 
+//风扇机械臂默认位置
+#define DEFAULT_HIGHT	250
+#define DEFAULT_SPEED	0
+#define DEFAULT_DIR		55
+
 // 风扇机械臂控制量
 typedef struct
 {
@@ -19,5 +24,6 @@ typedef struct
 }Fan_TypeDef;
 
 void Set_Fan(s16 height,s16 FanSpeed,s16 FanDirection);
+void FanStruct_Init(void);
 
 extern Fan_TypeDef FanCMD;

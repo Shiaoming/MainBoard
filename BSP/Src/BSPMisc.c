@@ -12,15 +12,6 @@ void delay_ms(int tmp)
 	}
 }
 
-/*******************************************************************************
-函 数 名：NVIC_Config(void)
-描    述：中断分组的配置
-*******************************************************************************/
-void NVIC_Config(void)
-{
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-}
-
 // 按键初始化函数
 void KEY_Init(void)
 {	
@@ -113,4 +104,21 @@ void BEEP_Init(void)
 	
 	GPIO_InitStructure.GPIO_Pin = PIN_BEEP; 
 	GPIO_Init(PORT_BEEP,&GPIO_InitStructure);
+}
+
+//各个外设的初始化
+void Peripheral_Init(void)
+{
+	// 中断向量表配置
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	
+	PS_Init();	
+    KEY_Init();	
+	STATU_Init();
+	LED_Init();
+	BEEP_Init();
+    CAN1_Init();
+	CAN2_Init();
+    OLED_Init();
+    ADC_Configuration();
 }

@@ -32,6 +32,9 @@
 #include "Can1.h"
 #include "Can2.h"
 #include "oled.h"
+#include "GYRO.h"
+#include "PS_Driver.h"
+#include "adc.h"
 
 
 /* APP -----------------------------------------------------------------------*/
@@ -40,9 +43,9 @@
 #include "TASK.h"
 #include "CANQueue.h"
 #include "ArmFan.h"
-#include "PS_Driver.h"
 #include "speed.h"
-#include "adc.h"
+#include "GP2Y0A21YK0F.h"
+
 
 
 

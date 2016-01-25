@@ -144,4 +144,194 @@ void Get_PS_Data(void)
 	PS.PS_Data[7] = SPI_WR(0x55);
 	PS.PS_Data[8] = SPI_WR(0x55);
 	PS_ATT_HIGH();
+	
+	// 根据手柄不同模式调通不同解析函数
+	if(PS.PS_Data[1] == Digital_Mode)
+		PS_Digital_Mode();
+	else if(PS.PS_Data[1] == Analog_Red)
+		PS_Analog_Red();
+}
+
+/*******************************************************************************
+函 数 名：PS_Digital_Mode(void)
+描    述：PS的数字模式
+*******************************************************************************/
+void PS_Digital_Mode(void)
+{
+	//暂时未用
+	if((PS.PS_Data[2] & SLCT) == 0)
+        ;
+	if((PS.PS_Data[2] & STRT) == 0)
+        ;
+    
+    //上下左右
+	if((PS.PS_Data[2] & UP) == 0)
+    {
+        Speed.vx = VX;
+    }
+    else if((PS.PS_Data[2] & DOWN) == 0)
+    {
+        Speed.vx = -VX;
+    }
+    else
+    {
+        Speed.vx = 0;
+    }
+            
+	if((PS.PS_Data[2] & RGHT) == 0)
+    {
+        Speed.vy = -VY;
+    }
+    else if((PS.PS_Data[2] & LEFT) == 0)
+    {
+        Speed.vy = VY;
+    }
+    else
+    {
+        Speed.vy = 0;
+    }
+
+    //旋转
+	if((PS.PS_Data[3] & L2) == 0)
+    {
+        Speed.wz = WZ;
+    }
+	else if((PS.PS_Data[3] & R2) == 0)
+    {
+        Speed.wz = -WZ;
+    }
+    else
+    {
+        Speed.wz = 0;
+    }
+
+        
+    //风扇朝向
+	if((PS.PS_Data[3] & R1) == 0)
+	{
+		FanCMD.FanDirection --;
+		RANGE_LIMIT(FanCMD.FanDirection,DIRECTION_MIN,DIRECTION_MAX);
+	}
+	if((PS.PS_Data[3] & L1) == 0)
+    {
+		FanCMD.FanDirection ++;
+		RANGE_LIMIT(FanCMD.FanDirection,DIRECTION_MIN,DIRECTION_MAX);
+	}
+	//机械臂高度
+    if((PS.PS_Data[3] & Triangle) == 0)
+	{
+		FanCMD.height ++;
+		RANGE_LIMIT(FanCMD.height,HEIGHT_MIN,HEIGHT_MAX);
+	}
+	else if((PS.PS_Data[3] & Cross) == 0)
+	{
+		FanCMD.height --;
+		RANGE_LIMIT(FanCMD.height,HEIGHT_MIN,HEIGHT_MAX);
+	}	
+	//风扇速度
+	if((PS.PS_Data[3] & Circular) == 0)
+	{
+		FanCMD.FanSpeed ++;
+		RANGE_LIMIT(FanCMD.FanSpeed,SPEED_MIN,SPEED_MAX);
+	}
+	else if((PS.PS_Data[3] & Square) == 0)
+	{
+		FanCMD.FanSpeed --;
+		RANGE_LIMIT(FanCMD.FanSpeed,SPEED_MIN,SPEED_MAX);
+	}
+}
+
+/*******************************************************************************
+函 数 名：PS_Analog_Red(void)
+描    述：PS的模拟红灯模式
+*******************************************************************************/
+void PS_Analog_Red(void)
+{
+		//暂时未用
+	if((PS.PS_Data[2] & SLCT) == 0)
+        ;
+	if((PS.PS_Data[2] & STRT) == 0)
+        ;
+    
+    //上下左右
+	if((PS.PS_Data[2] & UP) == 0)
+    {
+        Speed.vx = VX;
+    }
+    else if((PS.PS_Data[2] & DOWN) == 0)
+    {
+        Speed.vx = -VX;
+    }
+    else
+    {
+        Speed.vx = 0;
+    }
+            
+	if((PS.PS_Data[2] & RGHT) == 0)
+    {
+        Speed.vy = -VY;
+    }
+    else if((PS.PS_Data[2] & LEFT) == 0)
+    {
+        Speed.vy = VY;
+    }
+    else
+    {
+        Speed.vy = 0;
+    }
+
+    //旋转
+	if((PS.PS_Data[3] & L2) == 0)
+    {
+        Speed.wz = WZ;
+    }
+	else if((PS.PS_Data[3] & R2) == 0)
+    {
+        Speed.wz = -WZ;
+    }
+    else
+    {
+        Speed.wz = 0;
+    }
+
+        
+    //风扇朝向
+	if((PS.PS_Data[3] & R1) == 0)
+	{
+		FanCMD.FanDirection --;
+		RANGE_LIMIT(FanCMD.FanDirection,DIRECTION_MIN,DIRECTION_MAX);
+	}
+	if((PS.PS_Data[3] & L1) == 0)
+    {
+		FanCMD.FanDirection ++;
+		RANGE_LIMIT(FanCMD.FanDirection,DIRECTION_MIN,DIRECTION_MAX);
+	}
+	//机械臂高度
+    if((PS.PS_Data[3] & Triangle) == 0)
+	{
+		FanCMD.height ++;
+		RANGE_LIMIT(FanCMD.height,HEIGHT_MIN,HEIGHT_MAX);
+	}
+	else if((PS.PS_Data[3] & Cross) == 0)
+	{
+		FanCMD.height --;
+		RANGE_LIMIT(FanCMD.height,HEIGHT_MIN,HEIGHT_MAX);
+	}	
+	//风扇速度
+	if((PS.PS_Data[3] & Circular) == 0)
+	{
+		FanCMD.FanSpeed ++;
+		RANGE_LIMIT(FanCMD.FanSpeed,SPEED_MIN,SPEED_MAX);
+	}
+	else if((PS.PS_Data[3] & Square) == 0)
+	{
+		FanCMD.FanSpeed --;
+		RANGE_LIMIT(FanCMD.FanSpeed,SPEED_MIN,SPEED_MAX);
+	}
+
+	//摇杆采集的模拟值
+	PS.PS_Data[4] = PS.PS_Data[4];
+	PS.PS_Data[5] = PS.PS_Data[5];
+	PS.PS_Data[6] = PS.PS_Data[6];
+	PS.PS_Data[7] = PS.PS_Data[7];
 }
